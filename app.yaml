@@ -6,7 +6,7 @@ threadsafe: yes
 
 
 env_variables:
-    CLOUDSQL_CONNECTION_NAME: yuanze-photo-album:us-east1:photoalbum
+    CLOUDSQL_CONNECTION_NAME: yuanze-photo-album:us-east1:photo-album
     CLOUDSQL_USER: root
     CLOUDSQL_PASSWORD: password
 

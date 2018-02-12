@@ -18,7 +18,7 @@ import os
 import webapp2
 import MySQLdb
 import jinja2
-
+import sql_commands
 
 CLOUDSQL_CONNECTION_NAME = os.environ.get('CLOUDSQL_CONNECTION_NAME')
 CLOUDSQL_USER = os.environ.get('CLOUDSQL_USER')
@@ -71,6 +71,7 @@ class MainPage(webapp2.RequestHandler):
         cursor.execute('USE main')
         cursor.execute(
             'CREATE TABLE IF NOT EXISTS User(user_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), PRIMARY KEY(user_id)) ENGINE = InnoDB')
+        cursor.execute("CREATE TABLE IF NOT EXISTS Album (album_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), description TEXT, user_id INTEGER, PRIMARY KEY(album_id), CONSTRAINT FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB")
         cursor.execute('SHOW VARIABLES')
 
         for r in cursor.fetchall():
@@ -92,7 +93,10 @@ class RegisterHandler(webapp2.RequestHandler):
             cursor.execute(
                 "INSERT INTO User (name, email, password) VALUES ('{}', '{}', '{}')".format(
                     username, email, pw))
-            self.response.set_cookie('username', username, max_age=360)
+            cursor.execute(
+                "SELECT user_id FROM User WHERE email='{}'".format(email))
+            user_id = cursor.fetchone()[0]
+            self.response.set_cookie('user_id', str(user_id), max_age=360)
             self.redirect('/home', self.response)
         else:
             self.redirect('/?exist=True')
@@ -113,24 +117,30 @@ class LoginHandler(webapp2.RequestHandler):
         email = self.request.get('email')
         pw = self.request.get('key')
         cursor.execute(
-            "SELECT password, name FROM User WHERE email='{}'".format(email))
+            "SELECT password, name, user_id FROM User WHERE email='{}'".format(email))
         result = cursor.fetchone()
         if not result or result[0] != pw:
             template = JINJA_ENVIRONMENT.get_template('template/login.html')
             self.response.out.write(template.render(
                 {"ERROR": "Invalid email/password combination, please try again."}))
         else:
-            self.response.set_cookie('username', result[1], max_age=360)
+            self.response.set_cookie('user_id', str(result[2]), max_age=360)
             self.redirect('/home', self.response)
 
 
 class HomeHandler(webapp2.RequestHandler):
 
     def get(self):
-        username = self.request.cookies.get('username')
-        if not username:
+        user_id = self.request.cookies.get('user_id')
+        if not user_id:
             return self.redirect('/')
-        render_var = {"USERNAME": username}
+        user_id = int(user_id)
+        cursor.execute(
+            "SELECT name FROM User WHERE user_id = {}".format(user_id))
+        username = cursor.fetchone()[0]
+        cursor.execute(sql_commands.get_albums(user_id))
+        results = cursor.fetchall()
+        render_var = {"USERNAME": username, "ALBUMS": results}
         template = JINJA_ENVIRONMENT.get_template('template/usermain.html')
         self.response.out.write(template.render(render_var))
 
@@ -138,12 +148,31 @@ class HomeHandler(webapp2.RequestHandler):
 class LogoutHandler(webapp2.RequestHandler):
 
     def get(self):
-        self.response.delete_cookie("username")
+        self.response.delete_cookie("user_id")
         self.redirect('/', self.response)
+
+
+class AlbumCreateHandler(webapp2.RequestHandler):
+
+    def get(self):
+        self.redirect('/home')
+
+    def post(self):
+        name = self.request.get('albumname')
+        desc = self.request.get('description')
+        user_id = self.request.cookies.get('user_id')
+        user_id = int(user_id)
+        print "user_ID" + str(user_id)
+
+        cursor.execute(sql_commands.create_album(name, desc, user_id))
+        print "here"
+        self.redirect('/home')
 
 app = webapp2.WSGIApplication([
     ('/', LoginHandler),
     ('/home', HomeHandler),
     ('/logout', LogoutHandler),
-    ('/register', RegisterHandler)
+    ('/register', RegisterHandler),
+    ('/setup', MainPage),
+    ('/create', AlbumCreateHandler)
 ], debug=True)
