@@ -2,10 +2,90 @@
 <html>
 <head>
     <title>{{ USERNAME }}'s Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="../css/login.css">
 </head>
 <body>
 <h1>Welcome, {{ USERNAME }}!</h1>
 <input type="submit" id="btn-logout" class="btn btn-custom btn-lg btn-block" onclick="location.href = '../logout';" value="Log Out">
 
+<input type="button" id="btn-create-album" class="btn btn-custom btn-lg btn-block" value="Create a New Album" data-toggle="modal" data-target="#createAlbum">
+
+<div id="createAlbum" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Create a New Album</h4>
+        <form role="form" action="/create" method="post" id="album-form" autocomplete="off">
+            <div class="form-group">
+                <label for="albumname" class="sr-only">Album Name</label>
+                <input type="albumname" name="albumname" id="albumname" class="form-control" placeholder="Album Name" required>
+            </div>
+            <div class="form-group">
+                <label for="description" class="sr-only">Description</label>
+                <textarea type="text" name="description" id="description" rows = 3 class="form-control" placeholder="What this album is about?"></textarea>
+            </div>
+            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Create">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<input type="button" id="btn-upload-photo" class="btn btn-custom btn-lg btn-block" value="Upload photo" data-toggle="modal" data-target="#uploadPhoto">
+
+<div id="uploadPhoto" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Upload Photo</h4>
+        <form role="form" action="/upload" method="post" enctype="multipart/form-data" id="photo-form" autocomplete="off">
+            <div class="form-group">
+                <label for="photoname" class="sr-only">Photo Name</label>
+                <input type="photoname" name="photoname" id="photoname" class="form-control" placeholder="Photo Name">
+            </div>
+            <div class="form-group">
+                <label for="albumSelection" class="sr-only">Choose an Album</label>
+                <select class="form-control" id="albumSelection" name="albumSelection" required>
+                    {% for item in ALBUMS %}
+                        <option value="{{ item [0] }}">{{ item[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="file" name="photo" accept="image/*">
+            </div>
+            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Create">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<section>
+    {% for item in ALBUMS %}
+        <li><a href="album/{{ item[0] }}">{{ item[1] }}</a></li>
+    {% endfor %}
+</section>
 </body>
 </html>
