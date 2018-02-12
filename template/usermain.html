@@ -12,9 +12,9 @@
 <h1>Welcome, {{ USERNAME }}!</h1>
 <input type="submit" id="btn-logout" class="btn btn-custom btn-lg btn-block" onclick="location.href = '../logout';" value="Log Out">
 
-<input type="button" id="btn-create-album" class="btn btn-custom btn-lg btn-block" value="Create a New Album" data-toggle="modal" data-target="#myModal">
+<input type="button" id="btn-create-album" class="btn btn-custom btn-lg btn-block" value="Create a New Album" data-toggle="modal" data-target="#createAlbum">
 
-<div id="myModal" class="modal fade" role="dialog">
+<div id="createAlbum" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -34,6 +34,46 @@
                 <textarea type="text" name="description" id="description" rows = 3 class="form-control" placeholder="What this album is about?"></textarea>
             </div>
             <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Create">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<input type="button" id="btn-upload-photo" class="btn btn-custom btn-lg btn-block" value="Upload photo" data-toggle="modal" data-target="#uploadPhoto">
+
+<div id="uploadPhoto" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Upload Photo</h4>
+        <form role="form" action="/upload" method="post" enctype="multipart/form-data" id="photo-form" autocomplete="off">
+            <div class="form-group">
+                <label for="photoname" class="sr-only">Photo Name</label>
+                <input type="photoname" name="photoname" id="photoname" class="form-control" placeholder="Photo Name">
+            </div>
+            <div class="form-group">
+                <label for="albumSelection" class="sr-only">Choose an Album</label>
+                <select class="form-control" id="albumSelection" name="albumSelection" required>
+                    {% for item in ALBUMS %}
+                        <option value="{{ item [0] }}">{{ item[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="file" name="photo" accept="image/*">
+            </div>
+            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Create">
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -44,8 +84,7 @@
 </div>
 <section>
     {% for item in ALBUMS %}
-        <!-- <li><a href="{{ item.href }}">{{ item.name }}</a></li> -->
-        {{ item }}
+        <li><a href="album/{{ item[0] }}">{{ item[1] }}</a></li>
     {% endfor %}
 </section>
 </body>

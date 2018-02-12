@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+{% for item in PHOTOS %}
+    <img src="https://storage.googleapis.com{{ item[1] }}">
+{% endfor %}
+</body>
+</html>

@@ -9,6 +9,7 @@ env_variables:
     CLOUDSQL_CONNECTION_NAME: yuanze-photo-album:us-east1:photo-album
     CLOUDSQL_USER: root
     CLOUDSQL_PASSWORD: password
+    CLOUD_STORAGE_BUCKET: yuanze-photos
 
 handlers:
 - url: /favicon\.ico
