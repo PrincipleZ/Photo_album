@@ -1,18 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ USERNAME }}'s Home</title>
+    <title>{{ TITLE }}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="../css/login.css">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    {% block style %}
+    {% endblock %}
 </head>
+{% block content %}
 <body>
-<h1>Welcome, {{ USERNAME }}!</h1>
-<input type="submit" id="btn-logout" class="btn btn-custom btn-lg btn-block" onclick="location.href = '../logout';" value="Log Out">
+<header>
+    
+    <br>
+    <h3>My Album{{ ALBUM_NAME }}</h3>
+    {% if LOGGEDIN == true %}
+    <div class="button-container">
+        <div id="btn-upload-photo" class="btn btn-custom btn-lg upload" data-toggle="modal" data-target="#uploadPhoto">
+            <img style="width: 15%; margin-right: 5px;" src="../img/upload.png">
+            Upload Photo
+        </div> 
+        <div id="btn-create-album" class="btn btn-custom btn-lg upload" data-toggle="modal" data-target="#createAlbum">
+            <img style="width: 10%; margin-right: 5px;" src="../img/add.png">
+        Create Album</div>
+    </div>
+    
+    {% endif %}
+</header>
 
-<input type="button" id="btn-create-album" class="btn btn-custom btn-lg btn-block" value="Create a New Album" data-toggle="modal" data-target="#createAlbum">
+
 
 <div id="createAlbum" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -44,7 +63,7 @@
   </div>
 </div>
 
-<input type="button" id="btn-upload-photo" class="btn btn-custom btn-lg btn-block" value="Upload photo" data-toggle="modal" data-target="#uploadPhoto">
+
 
 <div id="uploadPhoto" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -72,7 +91,7 @@
             <div class="form-group">
                 <input type="file" name="photo" accept="image/*">
             </div>
-            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Create">
+            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Upload">
         </form>
       </div>
       <div class="modal-footer">
@@ -84,8 +103,17 @@
 </div>
 <section>
     {% for item in ALBUMS %}
-        <li><a href="album/{{ item[0] }}">{{ item[1] }}</a></li>
+        <div class="albumList" style="background-image: url('https://storage.googleapis.com{{item[2]}}');" onclick="location.href= 'album/{{ item[0] }}?redirected=True'">
+            <div class="albumText">
+                {{ item[1] }}
+                <br>
+                {{ item[3] }} Photo{{ item[4] }}
+            </div>
+        </div>
     {% endfor %}
+    
 </section>
 </body>
+{% endblock %}
+
 </html>

@@ -1,0 +1,85 @@
+body{
+
+}
+
+h1 {
+    display: inline-block;
+    width: 30%;
+}
+h3{
+    display: inline-block;
+    color:#1fa67b;
+    width: 30%;
+    margin: 20px 0;
+}
+
+.logout-container{
+    display: inline-block;
+    width: 69%;
+    text-align:right;
+}
+
+.button-container{
+    display: inline-block;
+    width: 69%;
+    text-align: right;
+    margin: 20px 0;
+}
+
+.button-container div{
+    width: 25%;
+    line-height: 2em;
+
+}
+.button-container div:hover{
+    background-color: #19845E;
+}
+#btn-logout{
+    color:#1fa67b;
+    background-color: #fff;
+    border: 2px solid #1fa67b;
+    position: relative;
+}
+
+#btn-logout:hover{
+    color:#fff;
+    background-color: #1fa67b;
+}
+.albumList {
+    display: inline-block;
+    width: 20%;
+    margin-top: 20px;
+    margin-right: 30px;
+    height: 200px;
+    background-color: lightgrey;
+    cursor: pointer;
+    background-size: 100% 100%;
+    position: relative;
+}
+.photoList{
+    background-size: contain;
+    display: inline-block;
+    width: 20%;
+    margin-top: 20px;
+    margin-right: 30px;
+    height: 200px;
+    background-color: lightgrey;
+    cursor: pointer;
+    position: relative;
+}
+.albumText{
+    text-decoration: none;
+    color: white;
+    position: absolute;
+    bottom:10px;
+    left:10px;
+    font-size: 130%;
+}
+.photoText{
+    text-decoration: none;
+    color: white;
+    position: absolute;
+    bottom:10px;
+    left:10px;
+    font-size: 130%;
+}

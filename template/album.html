@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
+{% extends "template/usermain.html" %}
+{% block content %}
+<h3 style="display: block;">My Album > {{ ALBUM_NAME }}</h3>
 {% for item in PHOTOS %}
-    <img src="https://storage.googleapis.com{{ item[1] }}">
+<div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');">
+    <div class="photoText">
+        {{ item[0] }}
+    </div>
+</div>
+    <!-- <img src="https://storage.googleapis.com{{ item[1] }}"> -->
 {% endfor %}
-</body>
-</html>
+{% endblock %}

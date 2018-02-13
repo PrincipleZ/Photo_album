@@ -65,3 +65,16 @@ def update_file_path(new_path, photo_id):
 def get_photos_from_album(album_id):
     return "SELECT name, file_path FROM Photo WHERE album_id = {}".format(
         album_id)
+
+
+def get_thumbnail(album_id):
+    return "SELECT file_path FROM Photo WHERE album_id = {} LIMIT 1".format(
+        album_id)
+
+
+def count_photo_from_album(album_id):
+    return "SELECT COUNT(*) From Photo WHERE album_id = {}".format(album_id)
+
+
+def get_album_name(album_id):
+    return "SELECT name FROM Album WHERE album_id = {}".format(album_id)

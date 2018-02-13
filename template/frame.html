@@ -1,0 +1,41 @@
+{% extends "template/usermain.html" %}
+{% block style %}
+<style type="text/css">
+    body {
+        width: 85%;
+        margin: 0 auto;
+        margin-top:20px;
+    }
+    .content{
+        margin-top: 20px;
+        border: none;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+<h1>{{ GREETING }}</h1>
+    <div class="logout-container">
+        {% if LOGGEDIN == true %}
+        <input type="submit" id="btn-logout" class="btn btn-custom btn-lg logout" onclick="location.href = '../logout';" value="Log Out">
+        {% else %}
+        <input type="button" id="btn-signin" class = "btn btn-custom btn-lg" value="Login/Register" onclick="location.href = '/';">
+        {% endif %}
+    </div>
+    
+<iframe class="content" id="content-frame" width =100% style="min-height: 80vh;" src="{{ SOURCE }}?redirected=True" >
+    
+</iframe>
+<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/297684461&amp;color=%231fa67b&amp;auto_play=true&amp;hide_related=true&amp;show_comments=false&amp;show_user=false&amp;show_reposts=false&amp;show_teaser=false&amp;visual=true"></iframe>
+<script type="text/javascript">
+    document.getElementById("content-frame").onload = function(){
+        var temp = document.getElementById("content-frame").contentWindow.location.href;
+        if (temp.includes("?redirected=True")){
+            console.log("here");
+            temp = temp.slice(0, temp.indexOf('?'));
+            console.log(temp);
+        }
+        history.replaceState(null,null,temp);
+    }
+</script>
+{% endblock %}

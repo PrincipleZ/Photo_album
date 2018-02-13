@@ -19,6 +19,7 @@ import webapp2
 import MySQLdb
 import jinja2
 import sql_commands
+import hash_functions
 import cloudstorage as gcs
 from google.appengine.api import app_identity
 import logging
@@ -99,14 +100,16 @@ class RegisterHandler(webapp2.RequestHandler):
         result = cursor.fetchone()
         if not result:
             cursor.execute(
-                "INSERT INTO User (name, email, password) VALUES ('{}', '{}', '{}')".format(
-                    username, email, pw))
+                "INSERT INTO User (name, email, hash_password) VALUES ('{}', '{}', '{}')".format(
+                    username, email, hash_functions.hash_password(pw)))
             cursor.execute(
                 "SELECT user_id FROM User WHERE email='{}'".format(email))
             db.commit()
             user_id = cursor.fetchone()[0]
-            self.response.set_cookie('user_id', str(user_id), max_age=360)
-            self.redirect('/home', self.response)
+            self.response.set_cookie('user_id', str(user_id), max_age=1200)
+            self.response.set_cookie(
+                'identifier', hash_functions.hash_password(pw), max_age=1200)
+            self.redirect('/fakehome', self.response)
         else:
             self.redirect('/?exist=True')
 
@@ -126,30 +129,56 @@ class LoginHandler(webapp2.RequestHandler):
         email = self.request.get('email')
         pw = self.request.get('key')
         cursor.execute(
-            "SELECT password, name, user_id FROM User WHERE email='{}'".format(email))
+            "SELECT hash_password, name, user_id FROM User WHERE email='{}'".format(email))
         result = cursor.fetchone()
-        if not result or result[0] != pw:
+        if not result or result[0] != hash_functions.hash_password(pw):
             template = JINJA_ENVIRONMENT.get_template('template/login.html')
             self.response.out.write(template.render(
                 {"ERROR": "Invalid email/password combination, please try again."}))
         else:
-            self.response.set_cookie('user_id', str(result[2]), max_age=360)
-            self.redirect('/home', self.response)
+            self.response.set_cookie('user_id', str(result[2]), max_age=1200)
+            self.response.set_cookie(
+                'identifier', str(
+                    result[0]), max_age=1200)
+            self.redirect('/fakehome', self.response)
 
 
 class HomeHandler(webapp2.RequestHandler):
 
     def get(self):
-        user_id = self.request.cookies.get('user_id')
-        if not user_id:
+        if not self.request.get("redirected"):
+            return self.redirect('/fakehome')
+        user_id = get_user_id_from_cookie(self)
+        if user_id == -1:
             return self.redirect('/')
-        user_id = int(user_id)
-        cursor.execute(
-            "SELECT name FROM User WHERE user_id = {}".format(user_id))
-        username = cursor.fetchone()[0]
         cursor.execute(sql_commands.get_albums(user_id))
         results = cursor.fetchall()
-        render_var = {"USERNAME": username, "ALBUMS": results}
+        result_list = []
+        for i in xrange(len(results)):
+
+            result_list.append(list(results[i]))
+            temp_id = results[i][0]
+            cursor.execute(sql_commands.get_thumbnail(temp_id))
+            path = cursor.fetchone()
+            photo_number = 0
+            if path:
+                path = path[0]
+                cursor.execute(sql_commands.count_photo_from_album(temp_id))
+                photo_number = cursor.fetchone()[0]
+            else:
+                path = "none"
+            result_list[i].append(path)
+            result_list[i].append(photo_number)
+            if photo_number > 1:
+                result_list[i].append("s")
+            else:
+                result_list[i].append("")
+
+        render_var = {
+            "LOGGEDIN": True,
+            "ALBUM_NAME": "",
+            "ALBUMS": result_list}
+
         template = JINJA_ENVIRONMENT.get_template('template/usermain.html')
         self.response.out.write(template.render(render_var))
 
@@ -158,28 +187,32 @@ class LogoutHandler(webapp2.RequestHandler):
 
     def get(self):
         self.response.delete_cookie("user_id")
+        self.response.delete_cookie("identifier")
         self.redirect('/', self.response)
 
 
 class AlbumCreateHandler(webapp2.RequestHandler):
 
     def get(self):
-        self.redirect('/home')
+        self.redirect('/fakehome')
 
     def post(self):
         name = self.request.get('albumname')
         desc = self.request.get('description')
-        user_id = self.request.cookies.get('user_id')
-        user_id = int(user_id)
-
+        user_id = get_user_id_from_cookie(self)
+        if user_id == -1:
+            return self.redirect('/')
         cursor.execute(sql_commands.create_album(name, desc, user_id))
         db.commit()
-        self.redirect('/home')
+        self.redirect('/home?redirected=True')
 
 
 class AlbumContentHandler(webapp2.RequestHandler):
 
     def get(self):
+        if not self.request.get("redirected"):
+            return self.redirect(
+                '/fakehome?from={}'.format(self.request.path))
         album_id = self.request.path[7:]
         album_id = int(album_id)
         ownership = False
@@ -195,7 +228,13 @@ class AlbumContentHandler(webapp2.RequestHandler):
                 ownership = True
         cursor.execute(sql_commands.get_photos_from_album(album_id))
         results = cursor.fetchall()
-        render_var = {"PHOTOS": results}
+        cursor.execute(sql_commands.get_album_name(album_id))
+        album_name = cursor.fetchone()[0]
+
+        render_var = {
+            "PHOTOS": results,
+            "LOGGEDIN": False,
+            "ALBUM_NAME": album_name}
         template = JINJA_ENVIRONMENT.get_template('template/album.html')
         self.response.out.write(template.render(render_var))
 
@@ -203,7 +242,7 @@ class AlbumContentHandler(webapp2.RequestHandler):
 class UploadHandler(webapp2.RequestHandler):
 
     def get(self):
-        self.redirect('/home')
+        self.redirect('/fakehome')
 
     def post(self):
         upload_file = self.request.POST.get('photo')
@@ -246,7 +285,7 @@ class UploadHandler(webapp2.RequestHandler):
             upload_file.type,
             file_path,
             upload_file.value)
-        self.redirect('/album/' + str(album_id))
+        self.redirect('/album/' + str(album_id) + "?redirected=True")
 
 
 def create_file(file_type, filename, data):
@@ -261,11 +300,59 @@ def create_file(file_type, filename, data):
     gcs_file.close()
 
 
+class HomeWithMusic(webapp2.RequestHandler):
+
+    def get(self):
+
+        forward_path = self.request.get('from')
+        if not forward_path:
+            forward_path = "/home"
+        user_id = get_user_id_from_cookie(self)
+        if user_id == -1:
+            if forward_path:
+
+                render_var = {"GREETING": "Welcome, my guest!",
+                              "SOURCE": forward_path, "LOGGEDIN": False}
+                template = JINJA_ENVIRONMENT.get_template(
+                    'template/frame.html')
+                self.response.headers.add("redirected", "True")
+                return self.response.out.write(template.render(render_var))
+            else:
+                return self.redirect('/')
+
+        cursor.execute(
+            "SELECT name FROM User WHERE user_id = {}".format(user_id))
+        username = cursor.fetchone()[0]
+        render_var = {"GREETING": "Hi, {}!".format(username),
+                      "SOURCE": forward_path, "LOGGEDIN": True}
+        template = JINJA_ENVIRONMENT.get_template('template/frame.html')
+        self.response.headers.add("redirected", "True")
+        self.response.out.write(template.render(render_var))
+
+
 def create_file_path(album_id, photo_id):
     return "/" + BUCKET_NAME + "/" + str(album_id) + "/" + str(photo_id)
 
+
+def get_user_id_from_cookie(app):
+    user_id = app.request.cookies.get('user_id')
+    pw = app.request.cookies.get('identifier')
+    if not user_id or not pw:
+        return -1
+    cursor.execute(
+        "SELECT hash_password FROM User WHERE user_id={}".format(user_id))
+    result = cursor.fetchone()
+    if not result:
+        return -1
+    elif result[0] != pw:
+        app.response.delete_cookie("user_id")
+        app.response.delete_cookie("identifier")
+        return -1
+    return int(user_id)
+
 app = webapp2.WSGIApplication([
     ('/', LoginHandler),
+    ('/fakehome', HomeWithMusic),
     ('/home', HomeHandler),
     ('/logout', LogoutHandler),
     ('/register', RegisterHandler),
