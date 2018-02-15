@@ -19,6 +19,16 @@ h3{
     text-align:right;
 }
 
+.albumLink{
+    text-decoration: none;
+    color: #1fa67b;
+}
+
+.albumLink:hover{
+    text-decoration: none;
+    color: #19845E;
+}
+
 .button-container{
     display: inline-block;
     width: 69%;
@@ -49,21 +59,26 @@ h3{
     display: inline-block;
     width: 20%;
     margin-top: 20px;
-    margin-right: 30px;
+    margin-left: 2%;
+    margin-right: 2%;
     height: 200px;
     background-color: lightgrey;
     cursor: pointer;
-    background-size: 100% 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: cover; 
     position: relative;
 }
 .photoList{
-    background-size: contain;
+    background-size: cover;
     display: inline-block;
     width: 20%;
     margin-top: 20px;
     margin-right: 30px;
     height: 200px;
     background-color: lightgrey;
+    background-repeat: no-repeat;
+    background-position: center; 
     cursor: pointer;
     position: relative;
 }
@@ -74,6 +89,11 @@ h3{
     bottom:10px;
     left:10px;
     font-size: 130%;
+    font-weight: bold;
+
+}
+.albumText:hover{
+    text-shadow:  1px 0 black, 0 1px black;
 }
 .photoText{
     text-decoration: none;
@@ -82,4 +102,13 @@ h3{
     bottom:10px;
     left:10px;
     font-size: 130%;
+}
+.albumDescription{
+    color:#686868;
+}
+.deleteIcon{
+    position:absolute;
+    max-width: 100%;
+    right:10px;
+    top:10px;
 }

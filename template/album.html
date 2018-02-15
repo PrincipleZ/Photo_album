@@ -1,10 +1,16 @@
 {% extends "template/usermain.html" %}
 {% block content %}
-<h3 style="display: block;">My Album > {{ ALBUM_NAME }}</h3>
+<h3 style="display: block;">
+{% if OWNER == true %}
+<a href="/home?redirected=true" class="albumLink">My Album</a> >
+{% endif %}
+ {{ ALBUM_NAME|e }}</h3>
+
+<p class="albumDescription">{{DESCRIPTION|e}}</p>
 {% for item in PHOTOS %}
 <div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');">
     <div class="photoText">
-        {{ item[0] }}
+        {{ item[0]|e }}
     </div>
 </div>
     <!-- <img src="https://storage.googleapis.com{{ item[1] }}"> -->

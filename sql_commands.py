@@ -1,80 +1,48 @@
 import hash_functions
 
 
-def check_user_exist(email):
-    return "SELECT * FROM User WHERE email='{}'".format(email)
+check_user_exist = "SELECT * FROM User WHERE email=%s"
 
 
-def create_user(username, email, password):
-
-    return "INSERT INTO User (name, email, password) VALUES ('{}', '{}', _binary'{}')".format(
-        username, email, hash_functions.hash_password(password))
+create_user = "INSERT INTO User (name, email, hash_password) VALUES (%s, %s, %s)"
 
 
-def get_user_id(email=None, username=None):
-    if email:
-        return "SELECT user_id FROM User WHERE email='{}'".format(email)
-    elif username:
-        return "SELECT user_id FROM User WHERE name='{}'".format(username)
-
-    return ""
+get_user_id_with_email = "SELECT user_id FROM User WHERE email=%s"
+get_user_id_with_username = "SELECT user_id FROM User WHERE name=%s"
+get_user_info = "SELECT hash_password, name, user_id FROM User WHERE email=%s"
 
 
-def get_user_info(email):
-
-    return "SELECT hash_password, name, user_id FROM User WHERE email='{}'".format(
-        email)
+create_album = "INSERT INTO Album (name, description, user_id) VALUES (%s, %s, %s)"
 
 
-def create_album(albumName, description, user_id):
-    return "INSERT INTO Album (name, description, user_id) VALUES ('{}', '{}', '{}')".format(
-        albumName, description, user_id)
+get_albums = "SELECT album_id, name FROM Album WHERE user_id = %s"
 
 
-def get_albums(user_id):
-    return "SELECT album_id, name FROM Album WHERE user_id = {}".format(
-        user_id)
+get_album_owner = "SELECT user_id FROM Album WHERE album_id = %s"
 
 
-def get_album_owner(album_id):
-    return "SELECT user_id FROM Album WHERE album_id = {}".format(album_id)
+create_photo = "INSERT INTO Photo (name, album_id, file_path) VALUES (%s, %s, %s)"
 
 
-def create_photo(album_id, name, file_path):
-    return "INSERT INTO Photo (name, album_id, file_path) VALUES ('{}', {}, '{}')".format(
-        name, album_id, file_path)
+get_next_photo_id = "SELECT photo_id FROM Photo ORDER BY photo_id DESC LIMIT 1"
 
 
-def get_next_photo_id():
-    return "SELECT photo_id FROM Photo ORDER BY photo_id DESC LIMIT 1"
+check_photo_id = "SELECT name FROM Photo WHERE photo_id= %s"
 
 
-def check_photo_id(photo_id):
-    return "SELECT name FROM Photo WHERE photo_id={}".format(photo_id)
+get_photo_id = "SELECT photo_id FROM Photo WHERE file_path = %s"
 
 
-def get_photo_id(path):
-    return "SELECT photo_id FROM Photo WHERE file_path = '{}'".format(path)
+update_file_path = "UPDATE Photo SET file_path=%s WHERE photo_id = %s"
 
 
-def update_file_path(new_path, photo_id):
-    return "UPDATE Photo SET file_path='{}' WHERE photo_id = {}".format(
-        new_path, photo_id)
+get_photos_from_album = "SELECT name, file_path FROM Photo WHERE album_id = %s"
 
 
-def get_photos_from_album(album_id):
-    return "SELECT name, file_path FROM Photo WHERE album_id = {}".format(
-        album_id)
+get_thumbnail = "SELECT file_path FROM Photo WHERE album_id = %s LIMIT 1"
 
 
-def get_thumbnail(album_id):
-    return "SELECT file_path FROM Photo WHERE album_id = {} LIMIT 1".format(
-        album_id)
+count_photo_from_album = "SELECT COUNT(*) From Photo WHERE album_id = %s"
 
 
-def count_photo_from_album(album_id):
-    return "SELECT COUNT(*) From Photo WHERE album_id = {}".format(album_id)
-
-
-def get_album_name(album_id):
-    return "SELECT name FROM Album WHERE album_id = {}".format(album_id)
+get_album_name_and_desc = "SELECT name, description FROM Album WHERE album_id = %s"

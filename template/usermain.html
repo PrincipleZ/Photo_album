@@ -16,7 +16,7 @@
 <header>
     
     <br>
-    <h3>My Album{{ ALBUM_NAME }}</h3>
+    <h3>My Album{{ ALBUM_NAME|e }}</h3>
     {% if LOGGEDIN == true %}
     <div class="button-container">
         <div id="btn-upload-photo" class="btn btn-custom btn-lg upload" data-toggle="modal" data-target="#uploadPhoto">
@@ -84,7 +84,7 @@
                 <label for="albumSelection" class="sr-only">Choose an Album</label>
                 <select class="form-control" id="albumSelection" name="albumSelection" required>
                     {% for item in ALBUMS %}
-                        <option value="{{ item [0] }}">{{ item[1] }}</option>
+                        <option value="{{ item [0] }}">{{ item[1]|e }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -104,10 +104,13 @@
 <section>
     {% for item in ALBUMS %}
         <div class="albumList" style="background-image: url('https://storage.googleapis.com{{item[2]}}');" onclick="location.href= 'album/{{ item[0] }}?redirected=True'">
+            <div class="deleteIcon">
+                <img src="../img/delete-red.png">
+            </div>
             <div class="albumText">
-                {{ item[1] }}
+                {{ item[1]|e }}
                 <br>
-                {{ item[3] }} Photo{{ item[4] }}
+                <span style="font-weight: normal;">{{ item[3] }} Photo{{ item[4] }}</span>
             </div>
         </div>
     {% endfor %}
