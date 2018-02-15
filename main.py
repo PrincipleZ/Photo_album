@@ -360,6 +360,22 @@ class HomeWithMusic(webapp2.RequestHandler):
         self.response.out.write(template.render(render_var))
 
 
+class DeleteHandler(webapp2.RequestHandler):
+
+    def get(self):
+        self.redirect('/fakehome')
+
+    def post(self):
+        db, cursor = get_conn_and_cursor()
+        user_id = get_user_id_from_cookie(self, cursor)
+        if user_id == -1:
+            return self.redirect('/')
+        target = self.request.POST.get('deleteTarget')
+        cursor.execute(sql_commands.delete_album, (target, ))
+        db.commit()
+        self.redirect("/home?redirected=True")
+
+
 def create_file_path(album_id, photo_id):
     return "/" + BUCKET_NAME + "/" + str(album_id) + "/" + str(photo_id)
 
@@ -403,5 +419,6 @@ app = webapp2.WSGIApplication([
     ('/setup', MainPage),
     ('/create', AlbumCreateHandler),
     ('/album/.*', AlbumContentHandler),
-    ('/upload', UploadHandler)
+    ('/upload', UploadHandler),
+    ('/delete', DeleteHandler)
 ], debug=True)

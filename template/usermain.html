@@ -8,6 +8,24 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="../css/login.css">
     <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <script type="text/javascript">
+        function showDelete(album){
+             // var k = album.children();
+             var icon = $(album).find(".deleteIcon");
+             icon.show();
+        }
+        function hideDelete(album){
+            var icon = $(album).find(".deleteIcon");
+             icon.hide();
+        }
+        
+        function showModel(icon){
+            // console.log("clicked");
+            // $("#delete").modal("show");
+            // $(icon)
+
+        }
+    </script>
     {% block style %}
     {% endblock %}
 </head>
@@ -103,10 +121,11 @@
 </div>
 <section>
     {% for item in ALBUMS %}
-        <div class="albumList" style="background-image: url('https://storage.googleapis.com{{item[2]}}');" onclick="location.href= 'album/{{ item[0] }}?redirected=True'">
+        <div class="albumList" style="background-image: url('https://storage.googleapis.com{{item[2]}}');" onclick="location.href= 'album/{{ item[0] }}?redirected=True'" onmouseenter="showDelete(this);" onmouseleave="hideDelete(this);">
             <div class="deleteIcon">
-                <img src="../img/delete-red.png">
+                <img src="../img/delete-red.png" id="{{ item[0] }}-{{ item[1]|e }}" class = "deleteImg" data-toggle="modal" data-target="#delete">
             </div>
+            
             <div class="albumText">
                 {{ item[1]|e }}
                 <br>
@@ -114,8 +133,39 @@
             </div>
         </div>
     {% endfor %}
-    
+            <div id="delete" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Are you sure to delete the album <span id="deleteAlbumName"></span> and photos inside?</p>
+                    <form role="form" action="/delete" method="post">
+                        <div class="form-group">
+                            <input type="hidden" name="deleteTarget" id="deleteTarget" class="form-control" value="">
+                        </div>
+                        <input type="submit" id="btn-submit" class="btn btn-danger" value="Delete">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                    </form>
+                  </div>
+                </div>
+                </div>
+            </div>
 </section>
+<script type="text/javascript">
+    $(".deleteImg").click(function(e) {
+        $('#delete').modal('toggle');
+        var deleteTarget = $(e.target).attr('id');
+        $('#delete').find('#deleteTarget').val(deleteTarget.slice(0, deleteTarget.indexOf('-')));
+        $('#delete').find('#deleteAlbumName').html(deleteTarget.slice(deleteTarget.indexOf('-')+1, deleteTarget.length));
+        $(".deleteImg").parent().click(function(ev) {
+            ev.stopPropagation();
+        });
+    });
+</script>
 </body>
 {% endblock %}
 

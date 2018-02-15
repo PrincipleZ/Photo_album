@@ -46,3 +46,5 @@ count_photo_from_album = "SELECT COUNT(*) From Photo WHERE album_id = %s"
 
 
 get_album_name_and_desc = "SELECT name, description FROM Album WHERE album_id = %s"
+
+delete_album = "DELETE FROM Album WHERE album_id = %s"

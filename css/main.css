@@ -64,9 +64,9 @@ h3{
     height: 200px;
     background-color: lightgrey;
     cursor: pointer;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
-    background-position: cover; 
+    background-position: center; 
     position: relative;
 }
 .photoList{
@@ -88,8 +88,9 @@ h3{
     position: absolute;
     bottom:10px;
     left:10px;
-    font-size: 130%;
     font-weight: bold;
+    width: 80%;
+    word-wrap: break-word;
 
 }
 .albumText:hover{
@@ -111,4 +112,16 @@ h3{
     max-width: 100%;
     right:10px;
     top:10px;
+    display: none;
 }
+
+.deleteIcon img{
+    -webkit-filter: grayscale(100%) opacity(40%);
+    filter: grayscale(100%) opacity(40%);
+}
+
+.deleteIcon img:hover{
+    -webkit-filter: grayscale(0%);
+    filter: grayscale(0%);
+}
+
