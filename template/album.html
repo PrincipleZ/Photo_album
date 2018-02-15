@@ -8,11 +8,57 @@
 
 <p class="albumDescription">{{DESCRIPTION|e}}</p>
 {% for item in PHOTOS %}
-<div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');">
+<div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');" onmouseenter="showDelete(this);" onmouseleave="hideDelete(this);">
+    {% if OWNER == true %}
+    <div class="deleteIcon">
+        <img src="../img/delete-red.png" id="{{ item[1] }}(&-&){{ item[0]|e }}" class = "deleteImg" data-toggle="modal" data-target="#delete">
+    </div>
+    {% endif %}
     <div class="photoText">
-        {{ item[0]|e }}
+        <a href='https://storage.googleapis.com{{item[1]}}' class="fresco" data-fresco-group="unique_name" 
+        data-fresco-caption="{{ item[0]|e }}">{{ item[0]|e }}</a>
+        
     </div>
 </div>
+
     <!-- <img src="https://storage.googleapis.com{{ item[1] }}"> -->
 {% endfor %}
+<div id="delete" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure to delete the photo <span id="deletePhotoName"></span> ?</p>
+        <form role="form" action="/delete" method="post">
+            <div class="form-group">
+                <input type="hidden" name="deleteTarget" id="deleteTarget" class="form-control" value="">
+                <input type="hidden" name="fromAlbum" id ="targetAlbum" class="form-control" value="1">
+            </div>
+            <input type="submit" id="btn-submit" class="btn btn-danger" value="Delete">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+        </form>
+      </div>
+    </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".deleteImg").click(function(e) {
+        $('#delete').modal('toggle');
+        var deleteTarget = $(e.target).attr('id');
+        var photo_id = deleteTarget.slice(0, deleteTarget.indexOf('(&-&)'));
+        console.log(photo_id)
+        photo_id = photo_id.slice(photo_id.lastIndexOf('/')+1)
+        $('#delete').find('#deleteTarget').val(photo_id);
+        deleteTarget = deleteTarget.slice(deleteTarget.indexOf('(&-&)')+5, deleteTarget.length);
+        console.log(deleteTarget);
+        $('#delete').find('#deletePhotoName').html(deleteTarget);
+        $(".deleteImg").parent().click(function(ev) {
+            ev.stopPropagation();
+        });
+    });
+</script></script>
 {% endblock %}

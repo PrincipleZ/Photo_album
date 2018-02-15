@@ -102,7 +102,14 @@ h3{
     position: absolute;
     bottom:10px;
     left:10px;
-    font-size: 130%;
+    font-size: 100%;
+    word-wrap: break-word;
+    width: 90%;
+    max-height:30%;
+    overflow: hidden;
+}
+.photoText:hover{
+    text-shadow:  1px 0 black, 0 1px black;
 }
 .albumDescription{
     color:#686868;
@@ -125,3 +132,14 @@ h3{
     filter: grayscale(0%);
 }
 
+body{
+    overflow-y:scroll !important;
+    overflow-x:hidden !important;
+    overflow:hidden;
+}
+
+#deletePhotoName{
+    overflow: hidden;
+    width: 100%;
+    word-wrap: break-word;
+}

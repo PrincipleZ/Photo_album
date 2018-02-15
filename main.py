@@ -371,7 +371,12 @@ class DeleteHandler(webapp2.RequestHandler):
         if user_id == -1:
             return self.redirect('/')
         target = self.request.POST.get('deleteTarget')
-        cursor.execute(sql_commands.delete_album, (target, ))
+        fromAlbum = self.request.POST.get('fromAlbum')
+        fromAlbum = int(fromAlbum)
+        if fromAlbum < 0:
+            cursor.execute(sql_commands.delete_album, (target, ))
+        else:
+            cursor.execute(sql_commands.delete_photo, (target, ))
         db.commit()
         self.redirect("/home?redirected=True")
 
