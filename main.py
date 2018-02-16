@@ -258,6 +258,7 @@ class AlbumContentHandler(webapp2.RequestHandler):
         render_var = {
             "PHOTOS": results,
             "OWNER": ownership,
+            "ALBUM_ID": album_id,
             "ALBUM_NAME": album_name[0],
             "DESCRIPTION": album_name[1]}
         template = JINJA_ENVIRONMENT.get_template('template/album.html')
@@ -279,6 +280,7 @@ class UploadHandler(webapp2.RequestHandler):
             name = upload_file.filename
         name = unicode(name)
         album_id = self.request.get('albumSelection')
+        album_id = int(album_id)
         cursor.execute(sql_commands.get_next_photo_id)
         result = cursor.fetchone()
         if not result:

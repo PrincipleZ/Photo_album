@@ -74,11 +74,12 @@ h3{
     display: inline-block;
     width: 20%;
     margin-top: 20px;
-    margin-right: 30px;
+    margin-right: 40px; 
+
     height: 200px;
     background-color: lightgrey;
     background-repeat: no-repeat;
-    background-position: center; 
+    background-position: center;
     cursor: pointer;
     position: relative;
 }
@@ -105,10 +106,12 @@ h3{
     font-size: 100%;
     word-wrap: break-word;
     width: 90%;
-    max-height:30%;
+    height: 70%;
     overflow: hidden;
+
 }
 .photoText:hover{
+    color:white;
     text-shadow:  1px 0 black, 0 1px black;
 }
 .albumDescription{
@@ -133,13 +136,23 @@ h3{
 }
 
 body{
-    overflow-y:scroll !important;
     overflow-x:hidden !important;
-    overflow:hidden;
+
 }
 
 #deletePhotoName{
     overflow: hidden;
     width: 100%;
     word-wrap: break-word;
+}
+
+.photoWrapper{
+    padding-left: 40px;
+    width: 95%;
+    margin: 0 auto;
+}
+
+.photoWrapper a{
+    text-decoration: none;
+
 }

@@ -1,28 +1,45 @@
 {% extends "template/usermain.html" %}
+{% block style %}
+<link href="../css/lity.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="../css/fresco/fresco.css"/>
+<script type="text/javascript" src="../js/fresco/fresco.js"></script>
+
+{% endblock %}
 {% block content %}
-<h3 style="display: block;">
+<h3 style="display: inline-block;">
 {% if OWNER == true %}
 <a href="/home?redirected=True" class="albumLink">My Album</a> >
 {% endif %}
  {{ ALBUM_NAME|e }}</h3>
+{% if OWNER == true %}
+<div class="button-container">
+    <div id="btn-upload-photo" class="btn btn-custom btn-lg upload" data-toggle="modal" data-target="#uploadPhoto">
+        <img style="width: 15%; margin-right: 5px;" src="../img/upload.png">
+        Upload Photo
+    </div> 
+</div>
+{% endif %}
+
 
 <p class="albumDescription">{{DESCRIPTION|e}}</p>
-{% for item in PHOTOS %}
-<div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');" onmouseenter="showDelete(this);" onmouseleave="hideDelete(this);">
-    {% if OWNER == true %}
-    <div class="deleteIcon">
-        <img src="../img/delete-red.png" id="{{ item[1] }}(&-&){{ item[0]|e }}" class = "deleteImg" data-toggle="modal" data-target="#delete">
-    </div>
-    {% endif %}
-    <div class="photoText">
-        <a href='https://storage.googleapis.com{{item[1]}}' class="fresco" data-fresco-group="unique_name" 
-        data-fresco-caption="{{ item[0]|e }}">{{ item[0]|e }}</a>
-        
-    </div>
+<div  class="photoWrapper">
+    {% for item in PHOTOS %}
+        <div class="photoList" style="background-image: url('https://storage.googleapis.com{{item[1]}}');" onmouseenter="showDelete(this);" onmouseleave="hideDelete(this);"  >
+            {% if OWNER == true %}
+            <div class="deleteIcon">
+                <img src="../img/delete-red.png" id="{{ item[1] }}(&-&){{ item[0]|e }}" class = "deleteImg" data-toggle="modal" data-target="#delete">
+            </div>
+            {% endif %}
+            <a class="fresco photoText" href='https://storage.googleapis.com{{item[1]}}' data-fresco-group="photo" data-fresco-caption="{{ item[0]|e }}">
+                <div style="position: absolute; bottom: 0px;">
+                {{ item[0]|e }}
+                </div>
+            </a>
+        </div>
+    {% endfor %}
 </div>
 
-    <!-- <img src="https://storage.googleapis.com{{ item[1] }}"> -->
-{% endfor %}
+<!-- Delete modal -->
 <div id="delete" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <!-- Modal content-->
@@ -45,6 +62,42 @@
     </div>
     </div>
 </div>
+<!-- Delete modal ends -->
+<!-- Upload modal -->
+<div id="uploadPhoto" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Upload Photo to {{ ALBUM_NAME }}</h4>
+        <form role="form" action="/upload" method="post" enctype="multipart/form-data" id="photo-form" autocomplete="off">
+            <div class="form-group">
+                <label for="photoname" class="sr-only">Photo Name</label>
+                <input type="photoname" name="photoname" id="photoname" class="form-control" placeholder="Photo Name">
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="albumSelection" name="albumSelection" required>
+                    <option value="{{ ALBUM_ID }}" selected>{{ ALBUM_NAME }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="file" name="photo" accept="image/*">
+            </div>
+            <input type="submit" id="btn-submit" class="btn btn-custom btn-lg btn-block" value="Upload">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- Upload modal ends -->
 <script type="text/javascript">
     $(".deleteImg").click(function(e) {
         $('#delete').modal('toggle');
@@ -60,5 +113,10 @@
             ev.stopPropagation();
         });
     });
-</script></script>
+
+</script>
+<script src="../js/lity.min.js"></script>
+<script type="text/javascript">
+    
+</script>
 {% endblock %}
