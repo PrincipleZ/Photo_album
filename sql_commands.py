@@ -36,7 +36,7 @@ get_photo_id = "SELECT photo_id FROM Photo WHERE file_path = %s"
 update_file_path = "UPDATE Photo SET file_path=%s WHERE photo_id = %s"
 
 
-get_photos_from_album = "SELECT name, file_path FROM Photo WHERE album_id = %s"
+get_photos_from_album = "SELECT name, file_path FROM Photo WHERE album_id = %s LIMIT %s, %s"
 
 
 get_thumbnail = "SELECT file_path FROM Photo WHERE album_id = %s LIMIT 1"

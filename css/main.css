@@ -156,3 +156,17 @@ body{
     text-decoration: none;
 
 }
+
+nav{
+    width: 40%;
+    position: absolute;
+    right: 5px;
+    text-align: right;
+    margin-top: 40px;
+}
+nav a{
+    margin-right: 5px;
+}
+.selected{
+    text-decoration: underline;
+}

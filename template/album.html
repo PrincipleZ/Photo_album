@@ -1,6 +1,5 @@
 {% extends "template/usermain.html" %}
 {% block style %}
-<link href="../css/lity.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="../css/fresco/fresco.css"/>
 <script type="text/javascript" src="../js/fresco/fresco.js"></script>
 
@@ -52,7 +51,7 @@
         <form role="form" action="/delete" method="post">
             <div class="form-group">
                 <input type="hidden" name="deleteTarget" id="deleteTarget" class="form-control" value="">
-                <input type="hidden" name="fromAlbum" id ="targetAlbum" class="form-control" value="1">
+                <input type="hidden" name="fromAlbum" id ="targetAlbum" class="form-control" value="{{ ALBUM_ID }}">
             </div>
             <input type="submit" id="btn-submit" class="btn btn-danger" value="Delete">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -97,6 +96,16 @@
 
   </div>
 </div>
+
+<nav>
+{% for PAGE in range(1, PAGES+1) %}
+    {% if PAGE == CURRENTPAGE %}
+    <a class="selected" href="?page={{ PAGE }}&redirected=True">{{PAGE}}</a>
+    {% else %}
+    <a href="?page={{ PAGE }}&redirected=True">{{PAGE}}</a>
+    {% endif %}
+{% endfor %}
+</nav>
 <!-- Upload modal ends -->
 <script type="text/javascript">
     $(".deleteImg").click(function(e) {
@@ -115,8 +124,19 @@
     });
 
 </script>
-<script src="../js/lity.min.js"></script>
 <script type="text/javascript">
-    
+    if (self == top){
+        var currentURL = window.location.href;
+        var album_id = -1;
+        startIndex = currentURL.indexOf('/album/');
+        if (startIndex != -1){
+            album_id = currentURL.slice(startIndex+7);
+            album_id = album_id.slice(0, album_id.indexOf('?'));
+        }
+
+        if (album_id != -1){
+            window.location = "/fakehome?from=/album/" + album_id;
+        }
+    }
 </script>
 {% endblock %}

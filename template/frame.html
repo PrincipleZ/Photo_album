@@ -37,7 +37,7 @@
 
         if (temp.includes("?redirected=True")){
             console.log("here");
-            temp = temp.slice(0, temp.indexOf('?'));
+            temp = temp.slice(0, temp.indexOf('?redirected=True'));
             console.log(temp);
         }
         history.replaceState(null,null,temp);

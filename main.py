@@ -35,6 +35,7 @@ CLOUDSQL_CONNECTION_NAME = os.environ.get('CLOUDSQL_CONNECTION_NAME')
 CLOUDSQL_USER = os.environ.get('CLOUDSQL_USER')
 CLOUDSQL_PASSWORD = os.environ.get('CLOUDSQL_PASSWORD')
 BUCKET_NAME = "yuanze-photos"
+PHOTO_ON_A_PAGE = 12
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(
@@ -236,12 +237,17 @@ class AlbumContentHandler(webapp2.RequestHandler):
         if not self.request.get("redirected"):
             return self.redirect(
                 '/fakehome?from={}'.format(self.request.path))
+        page = 1
+        if self.request.get("page"):
+            page = self.request.get("page")
+            page = int(page)
         album_id = self.request.path[7:]
         album_id = int(album_id)
         ownership = False
         user_id = get_user_id_from_cookie(self, cursor)
         if user_id > 0:
-            cursor.execute(sql_commands.get_album_owner, (album_id,))
+            cursor.execute(sql_commands.get_album_owner,
+                           (album_id, ))
             try:
                 owner = cursor.fetchone()[0]
             except:
@@ -250,7 +256,18 @@ class AlbumContentHandler(webapp2.RequestHandler):
                 return
             if owner == user_id:
                 ownership = True
-        cursor.execute(sql_commands.get_photos_from_album, (album_id,))
+        totalPages = count_pages(cursor, album_id)
+        print totalPages
+        print page
+        if totalPages < page:
+            return self.redirect(
+                '/album/' +
+                str(album_id) +
+                "?redirected=True")
+
+        print "here"
+        cursor.execute(sql_commands.get_photos_from_album, (album_id,
+                                                            PHOTO_ON_A_PAGE * (page - 1) + 1, PHOTO_ON_A_PAGE))
         results = cursor.fetchall()
         cursor.execute(sql_commands.get_album_name_and_desc, (album_id,))
         album_name = cursor.fetchone()
@@ -260,9 +277,10 @@ class AlbumContentHandler(webapp2.RequestHandler):
             "OWNER": ownership,
             "ALBUM_ID": album_id,
             "ALBUM_NAME": album_name[0],
-            "DESCRIPTION": album_name[1]}
+            "DESCRIPTION": album_name[1],
+            "PAGES": totalPages,
+            "CURRENTPAGE": page}
         template = JINJA_ENVIRONMENT.get_template('template/album.html')
-        print(render_var)
         close_connection(db, cursor)
         self.response.out.write(template.render(render_var))
 
@@ -377,10 +395,12 @@ class DeleteHandler(webapp2.RequestHandler):
         fromAlbum = int(fromAlbum)
         if fromAlbum < 0:
             cursor.execute(sql_commands.delete_album, (target, ))
+            db.commit()
+            self.redirect("/home?redirected=True")
         else:
             cursor.execute(sql_commands.delete_photo, (target, ))
-        db.commit()
-        self.redirect("/home?redirected=True")
+            db.commit()
+            self.redirect("/album/{}?redirected=True".format(str(fromAlbum)))
 
 
 def create_file_path(album_id, photo_id):
@@ -401,7 +421,14 @@ def get_user_id_from_cookie(app, cursor):
         app.response.delete_cookie("user_id")
         app.response.delete_cookie("identifier")
         return -1
-    return int(user_id)
+    else:
+        update_cookie(app, user_id, pw)
+        return int(user_id)
+
+
+def update_cookie(app, user_id, identifier):
+    app.response.set_cookie('user_id', user_id, max_age=1200)
+    app.response.set_cookie('identifier', identifier, max_age=1200)
 
 
 def get_conn_and_cursor():
@@ -409,6 +436,15 @@ def get_conn_and_cursor():
     cursor = db.cursor()
     cursor.execute('use main')
     return db, cursor
+
+
+def count_pages(cursor, album_id):
+    pages = 0
+    cursor.execute(sql_commands.count_photo_from_album, (album_id,))
+    photo_count = cursor.fetchone()[0]
+    pages = (photo_count / PHOTO_ON_A_PAGE) + 1
+
+    return pages
 
 
 def close_connection(db, cursor):
