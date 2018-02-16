@@ -132,6 +132,11 @@ class LoginHandler(webapp2.RequestHandler):
 
     def get(self):
         render_var = {"ERROR": ""}
+        db, cursor = get_conn_and_cursor()
+        user_id = get_user_id_from_cookie(self, cursor)
+        close_connection(db, cursor)
+        if user_id > 0:
+            return self.redirect('/fakehome')
         if self.request.get('exist'):
             render_var[
                 'ERROR'] = "The email has already been registered. Please log in directly or use another email to register."
