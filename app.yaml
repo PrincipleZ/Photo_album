@@ -1,15 +1,12 @@
+includes:
+- secret.yaml
+
 application: yuanze-photo-album
 version: 1
 runtime: python27
 api_version: 1
 threadsafe: yes
 
-
-env_variables:
-    CLOUDSQL_CONNECTION_NAME: yuanze-photo-album:us-east1:photo-album
-    CLOUDSQL_USER: root
-    CLOUDSQL_PASSWORD: password
-    CLOUD_STORAGE_BUCKET: yuanze-photos
 
 handlers:
 - url: /favicon\.ico
