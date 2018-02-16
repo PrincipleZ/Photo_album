@@ -74,23 +74,23 @@ def connect_to_cloudsql():
     return db
 
 
-class MainPage(webapp2.RequestHandler):
+# class MainPage(webapp2.RequestHandler):
 
-    def get(self):
-        """Simple request handler that shows all of the MySQL variables."""
-        self.response.headers['Content-Type'] = 'text/plain'
+#     def get(self):
+#         """Simple request handler that shows all of the MySQL variables."""
+#         self.response.headers['Content-Type'] = 'text/plain'
 
-        db = connect_to_cloudsql()
-        cursor = db.cursor()
-        cursor.execute('USE main')
-        cursor.execute(
-            'CREATE TABLE IF NOT EXISTS User(user_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), PRIMARY KEY(user_id)) ENGINE = InnoDB')
-        cursor.execute("CREATE TABLE IF NOT EXISTS Album (album_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), description TEXT, user_id INTEGER, PRIMARY KEY(album_id), CONSTRAINT FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB")
-        cursor.execute("CREATE TABLE IF NOT EXISTS Photo (photo_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), upload_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, file_path VARCHAR(255), album_id INTEGER, PRIMARY KEY(photo_id), CONSTRAINT FOREIGN KEY (album_id) REFERENCES Album (album_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB")
-        cursor.execute('SHOW VARIABLES')
+#         db = connect_to_cloudsql()
+#         cursor = db.cursor()
+#         cursor.execute('USE main')
+#         cursor.execute(
+#             'CREATE TABLE IF NOT EXISTS User(user_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), PRIMARY KEY(user_id)) ENGINE = InnoDB')
+#         cursor.execute("CREATE TABLE IF NOT EXISTS Album (album_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), description TEXT, user_id INTEGER, PRIMARY KEY(album_id), CONSTRAINT FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB")
+#         cursor.execute("CREATE TABLE IF NOT EXISTS Photo (photo_id INTEGER NOT NULL AUTO_INCREMENT, name VARCHAR(255), upload_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, file_path VARCHAR(255), album_id INTEGER, PRIMARY KEY(photo_id), CONSTRAINT FOREIGN KEY (album_id) REFERENCES Album (album_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB")
+#         cursor.execute('SHOW VARIABLES')
 
-        for r in cursor.fetchall():
-            self.response.write('{}\n'.format(r))
+#         for r in cursor.fetchall():
+#             self.response.write('{}\n'.format(r))
 
 
 class RegisterHandler(webapp2.RequestHandler):
@@ -464,7 +464,6 @@ app = webapp2.WSGIApplication([
     ('/home', HomeHandler),
     ('/logout', LogoutHandler),
     ('/register', RegisterHandler),
-    ('/setup', MainPage),
     ('/create', AlbumCreateHandler),
     ('/album/.*', AlbumContentHandler),
     ('/upload', UploadHandler),
